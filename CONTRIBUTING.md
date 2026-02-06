@@ -29,134 +29,145 @@ Thank you for your interest in contributing to agentlib.sh! This guide will help
 
 ## 📁 Resource Structure
 
-Each resource consists of two files in a dedicated folder:
+Each resource is a markdown file with frontmatter in a dedicated folder:
 
 ```
-resources/{type}/{platform}/{resource-name}/
-├── content.md       # The actual rule/command content
-└── metadata.yaml    # Metadata (name, description, tags, etc.)
+resources/{platform}/{type}/{resource-name}/content.md
 ```
 
 ### Path Components
 
-- **type**: `rules` or `commands`
 - **platform**: `cursor` or `claude-code`
+- **type**: Platform-specific types:
+  - **Cursor**: `rules`, `commands`, `skills`, `subagents`
+  - **Claude Code**: `commands`, `skills`, `agents`
 - **resource-name**: URL-friendly name (lowercase, hyphens)
 
-### Example
+### Examples
 
 ```
-resources/rules/cursor/conventional-commits/
-├── content.md
-└── metadata.yaml
+resources/cursor/commands/quick-commit/content.md
+resources/claude-code/skills/pdf-processing/content.md
+resources/claude-code/agents/code-reviewer/content.md
 ```
+
+**Note:** Skills may include additional supporting files (scripts, templates) in the same folder.
 
 ## 📝 Writing Guidelines
 
-### metadata.yaml
+### Frontmatter Schema
 
-Required fields:
+All resources use YAML frontmatter at the top of `content.md`. The registry auto-generates slug, name, tagline, and tags.
 
+**Commands:**
 ```yaml
-slug: unique-identifier            # Required: URL-friendly, unique across all resources
-name: Display Name                 # Required: Human-readable name
-description: |                     # Required: Clear explanation (2-4 sentences)
-  What this resource does and why it's useful.
-
-# Optional but recommended
-tagline: Short one-liner           # Optional: Displayed in search results
-problem_it_solves: |               # Optional: What problem does this solve?
-  Explanation of the pain point this addresses.
-source_url: https://example.com    # Optional: Reference or documentation URL
-command_syntax: /command-name      # Required for commands only
-
-# Tags (required)
-tags:
-  technology: [git, typescript]    # Technologies/tools this relates to
-  lifecycle: [development]         # Development phases (development, testing, deployment, etc.)
-  subject: [commits, testing]      # Topics/subjects covered
+---
+description: Clear 2-4 sentence description
+resource_type: command
+command_syntax: /command-name
+---
 ```
 
-### content.md
+**Skills:**
+```yaml
+---
+description: Clear 2-4 sentence description
+resource_type: skill
+---
+```
 
-Guidelines for writing clean content:
+**Agents/Subagents:**
+```yaml
+---
+name: agent-name
+description: When to use this agent
+resource_type: agent
+tools: Read, Grep, Bash
+model: sonnet
+---
+```
 
-1. **No frontmatter**: Keep metadata in `metadata.yaml`
-2. **Start with a clear title**: Use `# Title`
-3. **Include examples**: Show concrete usage
-4. **Be concise**: Get to the point quickly
-5. **Use proper formatting**: Code blocks, lists, emphasis
+**Rules (Cursor only):**
+```yaml
+---
+description: Clear 2-4 sentence description
+resource_type: rule
+source_url: https://reference.com  # Optional
+---
+```
 
-#### For Rules
+### Content Guidelines
 
+Write clean, concise markdown after frontmatter:
+
+1. **Start with frontmatter** - required metadata in YAML
+2. **Clear title** - use `# Title`
+3. **Include examples** - show concrete usage
+4. **Be concise** - get to the point quickly
+
+### Resource Type Specifics
+
+| Type | What to Include | Install Location |
+|------|----------------|------------------|
+| **Commands** | Brief prompt/workflow, usage examples, when to use | `.cursor/commands/` or `.claude/commands/` |
+| **Skills** | Capability description, supporting files (scripts, templates), usage guide | `.cursor/skills/*/SKILL.md` or `.claude/skills/*/SKILL.md` |
+| **Agents/Subagents** | System prompt, expertise domain, tool restrictions, when to invoke | `.cursor/agents/` or `.claude/agents/` |
+| **Rules** (Cursor only) | Code guidelines, formatting rules, conventions to follow | `.cursor/rules/` |
+
+**Commands:**
 ```markdown
-# Rule Title
+---
+description: Stage all changes and commit with one command
+resource_type: command
+command_syntax: /commit <message>
+---
 
-Brief explanation of what this rule enforces.
-
-## Why use this?
-
-Explain the benefits and use cases.
-
-## Examples
-
-### Good ✅
-[Example of good code]
-
-### Bad ❌
-[Example of what to avoid]
-
-## When to use
-
-- Situation 1
-- Situation 2
+# Quick Commit
+Brief description and usage...
 ```
 
-#### For Commands
-
+**Skills:**
 ```markdown
-# Command Title
+---
+description: Process PDF files and extract text
+resource_type: skill
+---
 
-Brief description of what the command does.
-
-## Usage
-
+# PDF Processing
+How to use this skill and supporting files...
 ```
-/command-name <arguments>
-```
 
-## What it does
+**Agents/Subagents:**
+```markdown
+---
+name: code-reviewer
+description: Expert code review specialist
+resource_type: agent
+tools: Read, Grep, Bash
+model: sonnet
+---
 
-1. Step 1
-2. Step 2
+You are an expert code reviewer.
 
-## Examples
-
-[Concrete examples]
-
-## When to use / When NOT to use
-
-[Guidance on appropriate usage]
+Focus on:
+- Security vulnerabilities
+- Performance implications
 ```
 
 ### Naming Conventions
 
-- **Folder names**: `lowercase-with-hyphens`
-- **Slugs**: Same as folder name (e.g., `conventional-commits`)
-- **File names**: Always `content.md` and `metadata.yaml`
+**Naming:**
+- Folders: `lowercase-with-hyphens`
+- File: Always `content.md`
+- Slug: Auto-generated from folder name
 
-### Tags Guidelines
+**Auto-generated Fields:**
 
-Choose appropriate tags from these categories:
-
-**Technology tags** (tools, languages, frameworks):
-- `git`, `typescript`, `javascript`, `python`, `react`, `vue`, `node`, `docker`, etc.
-
-**Lifecycle tags** (when to use):
-- `development`, `testing`, `deployment`, `debugging`, `refactoring`, `documentation`
-
-**Subject tags** (what it's about):
-- `commits`, `code-quality`, `security`, `performance`, `testing`, `api`, `database`, etc.
+The registry sync system automatically generates:
+- **slug**: From folder path
+- **name**: From folder name (titlecased)
+- **tagline**: Via LLM from description
+- **tags**: Via LLM from content analysis (technology, lifecycle, subject)
 
 ## 🔄 Submission Process
 
@@ -169,25 +180,27 @@ git checkout -b add-resource/your-resource-name
 ### 2. Create Your Resource
 
 ```bash
-# Create the folder structure
-mkdir -p resources/rules/cursor/your-resource-name
+# Example: Create a command
+mkdir -p resources/cursor/commands/your-command-name
+touch resources/cursor/commands/your-command-name/content.md
 
-# Create the files
-touch resources/rules/cursor/your-resource-name/content.md
-touch resources/rules/cursor/your-resource-name/metadata.yaml
+# Example: Create a skill (with supporting files)
+mkdir -p resources/claude-code/skills/your-skill-name
+touch resources/claude-code/skills/your-skill-name/content.md
+# Add supporting scripts/templates as needed
 ```
 
 ### 3. Write Content
 
-- Fill in `metadata.yaml` with all required fields
-- Write clear, helpful content in `content.md`
+- Add frontmatter with required fields to `content.md`
+- Write clear, helpful markdown content
 - Test your resource in Cursor/Claude Code
 
 ### 4. Commit and Push
 
 ```bash
 git add resources/
-git commit -m "feat: add your-resource-name rule for Cursor"
+git commit -m "feat: add your-resource-name {type} for {platform}"
 git push origin add-resource/your-resource-name
 ```
 
@@ -202,55 +215,27 @@ git push origin add-resource/your-resource-name
 
 Your submission will be evaluated on:
 
-### Quality
-
-- [ ] Clear, understandable content
-- [ ] Practical and useful
-- [ ] Well-formatted markdown
-- [ ] Includes examples
-- [ ] Free of typos and errors
-
-### Completeness
-
-- [ ] Both `content.md` and `metadata.yaml` present
-- [ ] All required metadata fields filled
-- [ ] Appropriate tags selected
-- [ ] Unique slug
-
-### Originality
-
-- [ ] Not a duplicate of existing resources
-- [ ] Adds value to the registry
-- [ ] Solves a real problem
-
-### Testing
-
-- [ ] Resource works as described
-- [ ] Tested in target platform (Cursor/Claude Code)
-- [ ] Examples are accurate
+- [ ] Clear, practical content with examples
+- [ ] `content.md` with proper frontmatter
+- [ ] All required frontmatter fields filled
+- [ ] Resource works as described in target platform
+- [ ] Not a duplicate, adds value
+- [ ] Well-formatted markdown, no typos
 
 ## 🎨 Style Guide
 
-### Markdown
+**Markdown:**
+- ATX-style headers (`#`, `##`)
+- Fenced code blocks with language tags
+- Bullet lists for unordered, numbered for sequential
 
-- Use ATX-style headers (`#`, `##`, `###`)
-- Use fenced code blocks with language identifiers
-- Use bullet lists for unordered items
-- Use numbered lists for sequential steps
+**Tone:**
+- Clear and direct
+- Professional and inclusive
 
-### Writing Tone
-
-- **Clear and direct**: Get to the point
-- **Helpful and friendly**: Assume good intent
-- **Professional**: Avoid slang and informal language
-- **Inclusive**: Use gender-neutral language
-
-### Code Examples
-
-- Use realistic examples
-- Show both good and bad patterns (when relevant)
+**Examples:**
+- Realistic and concise
 - Include comments for clarity
-- Keep examples concise
 
 ## ❓ Questions?
 

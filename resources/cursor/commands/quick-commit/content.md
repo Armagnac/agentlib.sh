@@ -1,3 +1,9 @@
+---
+description: A convenient command that stages all changes and creates a commit with the provided message in one step. Perfect for rapid development.
+resource_type: command
+command_syntax: /commit <message>
+---
+
 # Quick Commit Command
 
 Stage all changes and commit in one command.

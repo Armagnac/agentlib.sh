@@ -6,10 +6,12 @@ This repository contains the source content for [agentlib.sh](https://agentlib.s
 
 ## 🎯 What is this?
 
-agentlib.sh is a community-driven collection of:
+agentlib.sh is a community-driven collection of AI agent resources:
 
-- **Rules**: Guidelines and constraints that shape how AI agents write code
-- **Commands**: Reusable shortcuts and automations for common tasks
+- **Commands**: Manual slash commands for repeatable workflows
+- **Skills**: Auto-discovered capabilities with supporting files
+- **Agents/Subagents**: Specialized AI assistants with isolated context
+- **Rules** (Cursor only): Persistent guidelines for code generation
 
 These resources help you get more consistent, high-quality output from AI coding assistants.
 
@@ -17,18 +19,21 @@ These resources help you get more consistent, high-quality output from AI coding
 
 ```
 agentlib.sh/
-├── resources/
-│   ├── rules/
-│   │   ├── cursor/           # Rules for Cursor editor
-│   │   └── claude-code/      # Rules for Claude Code
-│   └── commands/
-│       ├── cursor/           # Commands for Cursor editor
-│       └── claude-code/      # Commands for Claude Code
+└── resources/
+    ├── cursor/
+    │   ├── rules/          # Persistent code guidelines
+    │   ├── commands/       # Manual slash commands
+    │   ├── skills/         # Auto-discovered capabilities
+    │   └── subagents/      # Specialized AI assistants
+    └── claude-code/
+        ├── commands/       # Manual slash commands
+        ├── skills/         # Auto-discovered capabilities
+        └── agents/         # Specialized AI assistants
 ```
 
-Each resource is a folder containing:
-- `content.md` - The actual rule/command content (clean, no metadata)
-- `metadata.yaml` - Name, description, tags, and other metadata
+Each resource is a markdown file with frontmatter:
+- Frontmatter contains metadata (description, type, etc.)
+- Content follows standard markdown format
 
 ## 🚀 Using Resources
 
@@ -38,11 +43,20 @@ Visit [agentlib.sh](https://agentlib.sh) to browse, search, and discover resourc
 
 ### Install Directly
 
-Each resource can be installed via curl:
-
+**Commands & Rules** (single files):
 ```bash
-# Example: Install the Conventional Commits rule
-curl https://raw.githubusercontent.com/YOUR_ORG/agentlib.sh/main/resources/rules/cursor/conventional-commits/content.md > .cursor/rules/conventional-commits.md
+curl https://raw.githubusercontent.com/YOUR_ORG/agentlib.sh/main/resources/cursor/commands/quick-commit/content.md > .cursor/commands/quick-commit.md
+```
+
+**Skills** (folder with SKILL.md):
+```bash
+mkdir -p .claude/skills/skill-name
+curl https://raw.githubusercontent.com/YOUR_ORG/agentlib.sh/main/resources/claude-code/skills/skill-name/content.md > .claude/skills/skill-name/SKILL.md
+```
+
+**Agents/Subagents** (files with frontmatter):
+```bash
+curl https://raw.githubusercontent.com/YOUR_ORG/agentlib.sh/main/resources/claude-code/agents/agent-name/content.md > .claude/agents/agent-name.md
 ```
 
 ## 🤝 Contributing
@@ -52,66 +66,78 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed gu
 ### Quick Start
 
 1. Fork this repository
-2. Create a new resource folder:
+2. Create a new resource:
    ```
-   resources/rules/cursor/your-resource-name/
-   ├── content.md
-   └── metadata.yaml
+   resources/{platform}/{type}/{resource-name}/content.md
    ```
-3. Write your content and metadata
+3. Add frontmatter and content
 4. Submit a pull request
 
-### Resource Quality Guidelines
+### Resource Guidelines
 
-- **Clear and focused**: Each resource should solve one specific problem
-- **Well-documented**: Include examples and use cases
-- **Tested**: Verify your resource works as expected
-- **Properly tagged**: Use appropriate technology, lifecycle, and subject tags
+- Clear and focused on one problem
+- Includes examples and use cases
+- Tested in target platform
+- Properly tagged
 
 ## 📝 Resource Format
 
-### metadata.yaml
+All resources use markdown with YAML frontmatter:
 
-```yaml
-slug: unique-identifier
-name: Display Name
-tagline: Short one-liner description
-description: |
-  Longer description explaining what this resource does
-  and why it's useful.
-problem_it_solves: |
-  Explanation of the problem this solves.
-source_url: https://optional-reference.com
-command_syntax: /optional-command-syntax  # For commands only
-tags:
-  technology: [git, typescript, react]
-  lifecycle: [development, testing, deployment]
-  subject: [commits, testing, documentation]
-```
-
-### content.md
-
-Clean markdown with/out frontmatter:
-
+### Commands
 ```markdown
-# Your Resource Title
+---
+description: Clear 2-4 sentence description
+resource_type: command
+command_syntax: /command-name
+---
 
-Clear explanation of what it does...
-
-## Examples
-
-Concrete examples...
+# Command Title
+Content here...
 ```
 
-## 📊 Statistics
+### Skills
+```markdown
+---
+description: Clear 2-4 sentence description
+resource_type: skill
+---
 
-- 2+ resources available
-- Supports Cursor and Claude Code
-- Community-driven and open source
+# Skill Title
+Content here...
+```
+
+### Agents/Subagents
+```markdown
+---
+name: agent-name
+description: When to use this agent
+resource_type: agent
+tools: Read, Grep, Bash
+model: sonnet
+---
+
+You are an expert in [domain]...
+```
+
+### Rules (Cursor only)
+```markdown
+---
+description: Clear 2-4 sentence description
+resource_type: rule
+source_url: https://reference.com  # Optional
+---
+
+# Rule Title
+Content here...
+```
+
+**Note:** Fields like slug, name, tagline, and tags are auto-generated by the registry sync system.
 
 ## 🔗 Links
 
 - Website: [agentlib.sh](https://agentlib.sh)
+- Community-driven and open source
 
 ---
 

@@ -1,3 +1,9 @@
+---
+description: This rule ensures all commit messages follow the Conventional Commits specification, making changelogs and versioning easier to manage. It helps maintain a clean and structured git history.
+resource_type: rule
+source_url: https://www.conventionalcommits.org
+---
+
 # Conventional Commits Rule
 
 When writing commit messages, follow the Conventional Commits specification:
