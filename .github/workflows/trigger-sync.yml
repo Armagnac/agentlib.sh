@@ -1,0 +1,32 @@
+name: Trigger Web Sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'resources/**'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  trigger-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger sync webhook
+        run: |
+          response=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.SYNC_WEBHOOK_URL }}" \
+            -H "Authorization: Bearer ${{ secrets.SYNC_WEBHOOK_SECRET }}" \
+            -H "Content-Type: application/json" \
+            -d '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}')
+          
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          
+          echo "HTTP Status: $http_code"
+          echo "Response: $body"
+          
+          if [ "$http_code" -ne 200 ]; then
+            echo "::error::Sync failed with status $http_code"
+            exit 1
+          fi
+          
+          echo "::notice::Resources synced successfully!"

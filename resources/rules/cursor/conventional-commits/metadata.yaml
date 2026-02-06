@@ -1,0 +1,15 @@
+slug: conventional-commits
+name: Conventional Commits Rule
+tagline: Enforce conventional commit message format
+description: |
+  This rule ensures all commit messages follow the Conventional Commits
+  specification, making changelogs and versioning easier to manage.
+  It helps maintain a clean and structured git history.
+problem_it_solves: |
+  Inconsistent commit messages make it hard to understand project history,
+  generate changelogs, and determine semantic version bumps automatically.
+source_url: https://www.conventionalcommits.org
+tags:
+  technology: [git]
+  lifecycle: [development]
+  subject: [commits, version-control, best-practices]
